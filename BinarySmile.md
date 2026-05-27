@@ -25,22 +25,27 @@ If count of `'1'` differs in (A) and (B), answer is `-1`.
 
 ---
 
-# Important Insight
+## Important Insight
 
-Track the positions of `'1'`s in order.
+Let:
 
-Suppose:
+- positions of `'1'` in `A` be: \(p_1, p_2, \dots\)
+- positions of `'1'` in `B` be: \(q_1, q_2, \dots\)
 
-* (i)-th `'1'` in (A) is at position (p_i)
-* (i)-th `'1'` in (B) is at position (q_i)
+Since one operation can only move a single `'1'` across zeroes:
 
-If (p_i \neq q_i), we need one operation to move this `'1'`.
+- the relative order of `'1'`s never changes
+- total number of `'1'`s must remain equal
 
-Thus:
+If \(p_i \ne q_i\), then the \(i\)-th `'1'` must be moved once.
 
-[
-\text{answer} = #{i : p_i \ne q_i}
-]
+Therefore:
+
+\[
+\text{minimum operations}
+=
+\#\{i \mid p_i \ne q_i\}
+\]
 
 ---
 
@@ -95,11 +100,7 @@ Hence minimum operations equals number of misplaced `'1'`s.
 
 # Complexity
 
-[
-O(N)
-]
-
-per test case.
+`O(N)` per test case.
 
 ---
 
