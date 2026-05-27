@@ -1,110 +1,35 @@
-# Editorial — Binary Smile
+# Binary Smile — Editorial
 
-Let:
+## Key Observations
 
-* (A) = initial binary string
-* (B) = target binary string
+**1. Impossible case**
+If the total count of `1`s in `A` ≠ total count of `1`s in `B`, output `-1`.
 
-Operation:
+**2. Each operation moves exactly one `1`**
+Reversing a substring with at most one `1` repositions that single `1` without crossing any other `1`. So the relative order of `1`s is preserved — the *i*-th `1` in `A` must map to the *i*-th `1` in `B`.
 
-* Choose any substring containing **at most one `'1'`**
-* Reverse it
+**3. Counting misplaced `1`s**
+A `1` at position `i` in `A` needs to move if and only if the prefix count of `1`s in `A` up to `i` exceeds the prefix count of `1`s in `B` up to `i` — meaning this `1` in `A` has no matching `1` in `B` at or before position `i`.
 
----
+This is captured by the condition:
+```
+A[i] == '1'  &&  (B[i] == '0'  ||  prefixOnes(A, i) != prefixOnes(B, i))
+```
 
-## Key Observation
+Each such `1` needs exactly one operation to reach its target, and these operations are independent (each touches only one `1`).
 
-Reversing a substring with at most one `'1'` only moves a single `'1'` across surrounding zeroes.
-
-So:
-
-* The relative order of all `'1'`s never changes.
-* Number of `'1'`s must remain same.
-
-If count of `'1'` differs in (A) and (B), answer is `-1`.
+**Answer = number of positions satisfying the condition above.**
 
 ---
 
-## Important Insight
+## Complexity
 
-Let:
-
-- positions of `'1'` in `A` be: \(p_1, p_2, \dots\)
-- positions of `'1'` in `B` be: \(q_1, q_2, \dots\)
-
-Since one operation can only move a single `'1'` across zeroes:
-
-- the relative order of `'1'`s never changes
-- total number of `'1'`s must remain equal
-
-If \(p_i \ne q_i\), then the \(i\)-th `'1'` must be moved once.
-
-Therefore:
-
-\[
-\text{minimum operations}
-=
-\#\{i \mid p_i \ne q_i\}
-\]
+- **Time:** O(N) per test case  
+- **Space:** O(N)
 
 ---
 
-# Simpler Characterization
-
-While scanning left to right:
-
-Maintain:
-
-* `c1` = number of `'1'` seen in (A)
-* `c2` = number of `'1'` seen in (B)
-
-Whenever:
-
-* current char in (A) is `'1'`
-* and either:
-
-  * current char in (B) is `'0'`, or
-  * prefix counts become equal
-
-we count one operation.
-
-This is exactly what the given code does.
-
----
-
-# Algorithm
-
-For each test case:
-
-1. Count total `'1'`s in both strings.
-2. If unequal → print `-1`
-3. Otherwise scan the strings:
-
-   * maintain prefix counts
-   * count required movements
-4. Print answer.
-
----
-
-# Correctness
-
-Each operation can reposition exactly one `'1'`.
-
-Every misplaced `'1'` must be moved at least once.
-
-Also, each misplaced `'1'` can always be moved independently using a substring containing only that `'1'`.
-
-Hence minimum operations equals number of misplaced `'1'`s.
-
----
-
-# Complexity
-
-`O(N)` per test case.
-
----
-
-# Reference Code
+## Implementation
 
 ```cpp
 #include <bits/stdc++.h>
@@ -116,22 +41,34 @@ int main() {
 
     int t;
     cin >> t;
-
     while (t--) {
         int n, c1 = 0, c2 = 0, ans = 0;
-        string a, b;
-
-        cin >> n >> a >> b;
+        string ss1, ss2;
+        cin >> n >> ss1 >> ss2;
 
         for (int i = 0; i < n; i++) {
-            if (a[i] == '1') c1++;
-            if (b[i] == '1') c2++;
-
-            if (a[i] == '1' && (b[i] == '0' || c1 != c2))
+            if (ss1[i] == '1') c1++;
+            if (ss2[i] == '1') c2++;
+            if (ss1[i] == '1' && (ss2[i] == '0' || c1 != c2))
                 ans++;
         }
 
         cout << (c1 == c2 ? ans : -1) << '\n';
     }
+    return 0;
 }
 ```
+
+---
+
+## Example Trace
+
+`A = "110"`, `B = "011"`
+
+| i | A[i] | B[i] | c1 | c2 | Condition | ans |
+|---|------|------|----|----|-----------|-----|
+| 0 | 1    | 0    | 1  | 0  | `'1' && ('0' \|\| 1≠0)` → ✓ | 1 |
+| 1 | 1    | 1    | 2  | 1  | `'1' && (false \|\| 2≠1)` → ✓ | 2 |
+| 2 | 0    | 1    | 2  | 2  | `'0' && ...` → ✗ | 2 |
+
+Output: **2** ✓
