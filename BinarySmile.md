@@ -1,33 +1,41 @@
 # Binary Smile — Editorial
 
-## Key Observations
+## The Core Idea
 
-**1. Impossible case**
-If the total count of `1`s in `A` ≠ total count of `1`s in `B`, output `-1`.
+You can only reverse a substring with **at most one `1`**. This means you can never move a `1` past another `1`. So **the 1s must stay in their original order** — the 1st `1` in A goes to where the 1st `1` is in B, the 2nd goes to the 2nd, and so on.
 
-**2. Each operation moves exactly one `1`**
-Reversing a substring with at most one `1` repositions that single `1` without crossing any other `1`. So the relative order of `1`s is preserved — the *i*-th `1` in `A` must map to the *i*-th `1` in `B`.
-
-**3. Counting misplaced `1`s**
-A `1` at position `i` in `A` needs to move if and only if the prefix count of `1`s in `A` up to `i` exceeds the prefix count of `1`s in `B` up to `i` — meaning this `1` in `A` has no matching `1` in `B` at or before position `i`.
-
-This is captured by the condition:
-```
-A[i] == '1'  &&  (B[i] == '0'  ||  prefixOnes(A, i) != prefixOnes(B, i))
-```
-
-Each such `1` needs exactly one operation to reach its target, and these operations are independent (each touches only one `1`).
-
-**Answer = number of positions satisfying the condition above.**
+If A and B have a different number of `1`s → impossible, print `-1`.
 
 ---
 
-## Complexity
+## How Many Operations?
 
-- **Time:** O(N) per test case  
-- **Space:** O(N)
+Each misplaced `1` costs exactly **1 operation** to fix (just reverse a range containing only that `1`).
+
+So the answer is simply: **how many `1`s in A are not already at their correct target position in B?**
 
 ---
+
+## How the Code Detects This in One Pass
+
+Instead of extracting positions separately, the code tracks a running count of `1`s seen so far in A (`c1`) and B (`c2`).
+
+At any position `i` where `A[i] = '1'`:
+- If `B[i] = '0'` → this `1` clearly isn't where it should be.
+- If `B[i] = '1'` but `c1 ≠ c2` → the prefix counts are out of sync, meaning this `1` in A doesn't actually line up with a `1` in B at the same index.
+
+Either way, that `1` needs to move → increment `ans`.
+
+---
+
+## Example
+
+`A = "110"`, `B = "011"`
+
+- 1st `1` of A is at index 0, 1st `1` of B is at index 1 → mismatch → needs 1 op  
+- 2nd `1` of A is at index 1, 2nd `1` of B is at index 2 → mismatch → needs 1 op  
+
+**Answer: 2**
 
 ## Implementation
 
